@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Phone Candy Shop</title>
+  <meta name="theme-color" content="#f7f7fb">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main: #675cff;
+      --main2: #fe2c55;
+      --shadow: 0 2px 18px #6563ff19;
+      --radius: 18px;
+      --bg: #f7f7fb;
+      --block: #fff;
+      --soft: #f3f5fa;
+    }
+    html, body {
+      background: var(--bg);
+      margin: 0; padding: 0;
+      font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
+      color: #18192c;
+      min-height: 100vh; height: 100%;
+      overscroll-behavior: none;
+    }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .hidden { display: none !important; }
+    .header {
+      position: sticky; top: 0;
+      background: var(--block);
+      padding: 18px 0 9px 0; z-index: 20;
+      box-shadow: 0 1px 10px #6563ff0a;
+      display: flex; flex-direction: column; align-items: center;
+      border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+      min-height: 62px;
+    }
+    .logo {
+      font-weight: 900; font-size: 1.35rem; letter-spacing: 2px;
+      color: var(--main);
+      background: linear-gradient(90deg, var(--main) 40%, var(--main2) 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 1px 9px #6563ff0a;
+      margin-bottom: 6px; user-select: none;
+    }
+    .search-bar {
+      width: 90vw; max-width: 380px; display: flex; align-items: center;
+      border-radius: 16px; background: var(--soft); padding: 6px 13px;
+      box-shadow: 0 1.5px 9px #9992;
+    }
+    .search-bar input {
+      border: none; outline: none; background: none;
+      font-size: 1.07rem; width: 100%; color: #222;
+      padding: 3px 0; font-family: inherit; border-radius: 10px;
+      background: none;
+    }
+    .main-list {
+      padding: 20px 0 76px 0; display: flex; flex-wrap: wrap; gap: 20px;
+      justify-content: center; max-width: 520px; margin: 0 auto; z-index: 1;
+    }
+    .card {
+      background: var(--block); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px 12px 16px 12px; width: 195px; max-width: 92vw;
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer; position: relative;
+      transition: box-shadow .14s, transform .14s; user-select: none;
+      min-height: 220px; border: 1.5px solid #edeef9; overflow: hidden;
+    }
+    .card:hover, .card:active {
+      box-shadow: 0 9px 36px #675cff21;
+      border: 1.8px solid var(--main2);
+      transform: translateY(-3px) scale(1.016);
+    }
+    .card-img {
+      width: 81px; height: 107px; object-fit: contain; border-radius: 13px;
+      background: #f3f5fa; margin-bottom: 7px; transition: filter .13s;
+      filter: drop-shadow(0 4px 14px #8891); box-shadow: 0 2px 10px #d6dcfc;
+    }
+    .color-dots { margin: 5px 0 10px 0; display: flex; gap: 9px; }
+    .color-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #ececec; box-shadow: 0 1px 4px #aaa3; }
+    .card-title {
+      font-size: 1.03rem; font-weight: 800; margin: 0 0 1px 0;
+      text-align: center; letter-spacing: .1px; line-height: 1.21;
+      color: #1b1c26; text-shadow: 0 2px 14px #ced6ff22;
+    }
+    .card-desc {
+      font-size: 0.95rem; color: #838ab1; text-align: center;
+      margin-bottom: 4px; margin-top: 0.5px; line-height: 1.14; font-weight: 600;
+    }
+    .card-stars { display: flex; align-items: center; gap: 2px; margin-bottom: 3px; font-size: 1.03em; letter-spacing: 0.01em; }
+    .star { color: gold; font-size: 1.07rem; margin-right: 1.1px; filter: drop-shadow(0 1px 1px #fe2c5512); text-shadow: 0 1px 2px #ffefb7b9; }
+    .sim-icons { display: flex; gap: 11px; margin: 7px 0 0 0; justify-content: center; }
+    .sim-icon-img {
+      width: 36px; height: 36px; background: #f7f7fa; border-radius: 9px;
+      border: 2px solid #e7e8fc; object-fit: contain; box-shadow: 0 1px 7px #e2e6fc;
+      padding: 2px; transition: box-shadow .12s, border .12s;
+    }
+    .footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--block); box-shadow: 0 -1px 10px #675cff14; height: 59px;
+      display: flex; align-items: center; justify-content: center; z-index: 21;
+      border-top-left-radius: 15px; border-top-right-radius: 15px;
+    }
+    .bell {
+      width: 27px; height: 27px; opacity: 0.62;
+      filter: drop-shadow(0 1.2px 2.5px #675cff16);
+    }
+    .modal-bg {
+      position: fixed; top:0;left:0;right:0;bottom:0;
+      background: rgba(64,65,84,0.11); z-index: 99;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .18s;
+      touch-action: none;
+    }
+    .modal {
+      background: var(--block); border-radius: 23px; box-shadow: 0 4px 32px #6563ff24;
+      min-width: 245px; max-width: 97vw; padding: 25px 14px 17px 14px; position: relative;
+      animation: pop .21s cubic-bezier(.7,-0.06,.49,1.4); transition: box-shadow .18s;
+      border: 2.5px solid #edeef9;
+      z-index: 200;
+    }
+    @keyframes pop { from { transform: scale(0.82);} to { transform: scale(1);} }
+    .modal-close {
+      position: absolute; top: 13px; right: 19px; background: none; border: none;
+      font-size: 1.28rem; color: #b3b6ce; cursor: pointer; transition: color .11s; z-index: 2; font-weight: bold;
+    }
+    .modal-close:hover { color: var(--main2); }
+    .modal-img {
+      width: 87px; height: 112px; object-fit: contain; display: block; margin: 0 auto 13px auto;
+      border-radius: 12px; background: #f6f6f8; box-shadow: 0 2px 11px #a5b5dc36;
+    }
+    .modal-colors, .modal-storages, .modal-sims {
+      display: flex; justify-content: center; gap: 16px; margin: 11px 0; flex-wrap: wrap;
+    }
+    .modal-color {
+      width: 27px; height: 27px; border-radius: 50%; border: 2.5px solid #eee;
+      cursor: pointer; transition: border .15s, box-shadow .14s; box-sizing: border-box;
+      margin-bottom: 2px; box-shadow: 0 1px 7px #aaa2;
+    }
+    .modal-color.selected { border: 3px solid var(--main2); box-shadow: 0 3px 13px #fe2c5542; }
+    .modal-storage {
+      min-width: 57px; padding: 7px 12px; border-radius: 10px; font-size: 1.1rem; background: #f3f4fa;
+      color: var(--main); border: 2.3px solid #e6e7fb; cursor: pointer; font-weight: 700;
+      letter-spacing: 0.01em; transition: border .14s, background .12s, color .13s;
+    }
+    .modal-storage.selected { border: 2.6px solid var(--main2); background: #fff4f6; color: var(--main2); box-shadow: 0 1px 7px #fe2c5520; }
+    .modal-sim {
+      border-radius: 13px; padding: 4px; border: 2.4px solid #e7e8fc; background: #f6f8fb;
+      cursor: pointer; transition: border .14s, box-shadow .13s; box-shadow: 0 1.7px 7px #e3e6f8;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 2px;
+    }
+    .modal-sim.selected { border: 2.7px solid var(--main2); background: #fff4f7; box-shadow: 0 2px 9px #fe2c5533; }
+    .modal-sim img {
+      width: 40px; height: 40px; object-fit: contain; border-radius: 7px; background: #fafafd;
+      border: none; transition: box-shadow .14s; box-shadow: 0 1.5px 6px #d9dafc;
+    }
+    .modal-title { font-weight: 800; font-size: 1.17rem; margin-bottom: 7px; text-align: center; color: #191b24; text-shadow: 0 1px 8px #ced6ff16; letter-spacing: 0.01em; }
+    .modal-rating { font-size: 1.01rem; margin-bottom: 3px; text-align: center; color: #666; font-weight: 600; }
+    .modal-continue {
+      display: block; background: linear-gradient(90deg,var(--main) 60%,var(--main2));
+      color: #fff; border: none; width: 100%; font-size: 1.11rem; padding: 15px 0; border-radius: 13px;
+      margin-top: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 9px #6563ff2a;
+      transition: background .13s; letter-spacing: 0.04em;
+      font-size: 1.15rem;
+    }
+    .modal-continue:active { opacity: 0.89; }
+
+    /* Delivery animation — полностью на transform, максимально плавно */
+    .delivery-anim-bg {
+      position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(245,247,252,0.99);
+      z-index: 130; display: flex; align-items: center; justify-content: center;
+      transition: background .33s; overflow: hidden;
+      touch-action: none;
+    }
+    .delivery-stage {
+      width: 100vw; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center;
+      min-height: 380px;
+    }
+    .delivery-car-img {
+      position: absolute; left: 50%; top: 49%;
+      width: 340px; max-width: 96vw; height: auto;
+      transform: translate(-50%, -50%) scale(1.09) translateX(-120vw);
+      z-index: 20;
+      filter: drop-shadow(0 12px 32px #0c1527aa);
+      opacity: 0;
+      will-change: transform, opacity;
+      transition: transform 0.78s cubic-bezier(.46,1.4,.61,1), opacity 0.2s;
+    }
+    .delivery-car-img.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.09) translateX(0vw);
+      transition: transform 0.78s cubic-bezier(.46,1.4,.61,1), opacity 0.22s;
+    }
+    .delivery-car-img.leaving {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.09) translateX(120vw);
+      transition: transform 1.18s cubic-bezier(.56,1.2,.64,1.11), opacity 0.2s;
+    }
+    .delivery-greenbox {
+      position: absolute; top: 46%; left: 50%; transform: translate(-50%,-50%) scale(0.7);
+      min-width: 255px; max-width: 95vw; background: #41d87e;
+      border-radius: 29px; box-shadow: 0 2px 26px #1baa6045;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 52px 23px 36px 23px;
+      opacity: 0; z-index: 110;
+      pointer-events: none;
+      transition: opacity 0.44s cubic-bezier(.45,1.19,.41,1.14), transform 0.44s cubic-bezier(.45,1.19,.41,1.14);
+    }
+    .delivery-greenbox.visible {
+      opacity: 1;
+      transform: translate(-50%,-50%) scale(1);
+      transition: opacity 0.44s cubic-bezier(.45,1.19,.41,1.14), transform 0.44s cubic-bezier(.45,1.19,.41,1.14);
+    }
+    .delivery-greenbox .check {
+      width: 74px; height: 74px; background: #fff;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: #41d87e; font-size: 2.6rem; margin-bottom: 22px; box-shadow: 0 1px 14px #fff8;
+    }
+    .delivery-greenbox .label {
+      color: #fff; font-size: 1.46rem; font-weight: 900; letter-spacing: 0.01em; text-align: center;
+      text-shadow: 0 2px 14px #0a55158a;
+    }
+    @media (max-width: 700px) {
+      .main-list {max-width: 100vw;}
+      .card {width: 96vw; max-width: 220px;}
+      .modal {max-width:98vw;}
+      .delivery-car-img {width:92vw; min-width:140px; max-width:99vw;}
+      .delivery-greenbox {max-width:95vw;}
+    }
+    @media (max-width: 400px) {
+      .main-list {gap: 9px;}
+      .card {min-height: 180px;}
+      .delivery-car-img {width:97vw;}
+      .delivery-greenbox {padding:36px 6vw 24px 6vw;}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">Phone Candy</span>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search for phone...">
+    </div>
+  </div>
+  <div class="main-list" id="main-list"></div>
+  <div class="footer">
+    <svg class="bell" fill="none" viewBox="0 0 24 24"><path d="M14 19.5A2 2 0 0 1 12 21.5a2 2 0 0 1-2-2" stroke="#222" stroke-width="1.5" stroke-linecap="round"/><path d="M5.5 8A6.5 6.5 0 1 1 18.5 8c0 7-2.5 9-6.5 9S5.5 15 5.5 8Z" stroke="#222" stroke-width="1.5"/></svg>
+  </div>
+  <div id="modal-bg" class="modal-bg hidden"></div>
+  <div id="delivery-bg" class="delivery-anim-bg hidden"></div>
+  <script>
+    // ----------- DATA ------------
+    const simIconsArr = [
+      "https://i.ibb.co/S42CDLr4/123.png",
+      "https://i.ibb.co/qMStyHkS/12321332.png",
+      "https://i.ibb.co/ZpkDqBWf/112344.png"
+    ];
+    const phones = [
+      { title: "iPhone 16 Pro", desc: "Apple flagship", rating: 4.8,
+        img: "https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp",
+        colors: [
+          {name:"Black Titanium", url:"https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp", hex:"#363636"},
+          {name:"Natural Titanium", url:"https://i.ibb.co/Vp2KFDjw/natural-titanium-1-700x700.webp", hex:"#cdc6bb"},
+          {name:"White Titanium", url:"https://i.ibb.co/r2m0tP1j/white-titanium.webp", hex:"#f9f9f9"},
+        ],
+        storages: ["256GB", "512GB", "1TB"]
+      },
+      { title: "iPhone 16", desc: "Apple, compact", rating: 4.4,
+        img: "https://i.ibb.co/Vp2KFDjw/natural-titanium-1-700x700.webp",
+        colors: [
+          {name:"Natural Titanium", url:"https://i.ibb.co/Vp2KFDjw/natural-titanium-1-700x700.webp", hex:"#cdc6bb"},
+          {name:"Black Titanium", url:"https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp", hex:"#363636"},
+        ],
+        storages: ["128GB", "256GB", "512GB"]
+      },
+      { title: "15 Pro Max", desc: "Apple, premium", rating: 4.5,
+        img: "https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp",
+        colors: [
+          {name:"Black Titanium", url:"https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp", hex:"#363636"},
+          {name:"Natural Titanium", url:"https://i.ibb.co/Vp2KFDjw/natural-titanium-1-700x700.webp", hex:"#cdc6bb"},
+        ],
+        storages: ["256GB", "512GB"]
+      },
+      { title: "iPhone 14", desc: "Apple, compact", rating: 3.8,
+        img: "https://i.ibb.co/r2m0tP1j/white-titanium.webp",
+        colors: [
+          {name:"White Titanium", url:"https://i.ibb.co/r2m0tP1j/white-titanium.webp", hex:"#f9f9f9"},
+        ],
+        storages: ["128GB", "256GB"]
+      },
+      { title: "Samsung Galaxy S25", desc: "Silver Shadow, 2025", rating: 4.6,
+        img: "https://i.ibb.co/RTPKzfsV/smartfon-samsung-galaxy-s25-12-512gb-silver-shadow-sm-s931bzsheuc-4ec170bd-d08d-457a-a944-e5596e9709.webp",
+        colors: [
+          {name:"Silver Shadow", url:"https://i.ibb.co/RTPKzfsV/smartfon-samsung-galaxy-s25-12-512gb-silver-shadow-sm-s931bzsheuc-4ec170bd-d08d-457a-a944-e5596e9709.webp", hex:"#ccd3db"},
+          {name:"Black", url:"https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp", hex:"#2e2e2e"}
+        ],
+        storages: ["256GB", "512GB", "1TB"]
+      },
+      { title: "Vertu Metavertu 2", desc: "Web3 AI Phone", rating: 4.9,
+        img: "https://i.ibb.co/ccDD5vLz/vertu-metavertu-2-calfskin-web3-ai-phone-512gb-white-f0a5af07-dc38-4fa6-bbd0-ec93e6b6db4e-3-png.webp",
+        colors: [
+          {name:"White Calfskin", url:"https://i.ibb.co/ccDD5vLz/vertu-metavertu-2-calfskin-web3-ai-phone-512gb-white-f0a5af07-dc38-4fa6-bbd0-ec93e6b6db4e-3-png.webp", hex:"#fafafa"}
+        ],
+        storages: ["512GB"]
+      },
+      { title: "iPhone 16 Pro Max", desc: "Blue Titanium", rating: 4.7,
+        img: "https://i.ibb.co/Zz1YyBNH/iphone-16-pro-max-512-gb-blue-titanium-5-png.webp",
+        colors: [
+          {name:"Blue Titanium", url:"https://i.ibb.co/Zz1YyBNH/iphone-16-pro-max-512-gb-blue-titanium-5-png.webp", hex:"#668caa"},
+          {name:"Black Titanium", url:"https://i.ibb.co/sdzH9qy6/black-titanium-1-700x700.webp", hex:"#232527"}
+        ],
+        storages: ["256GB", "512GB", "1TB"]
+      }
+    ];
+    function simIcons() {
+      return simIconsArr.map(url =>
+        `<img class="sim-icon-img" src="${url}" alt="SIM">`
+      ).join('');
+    }
+    function starRow(r) {
+      let full = Math.floor(r), half = r%1>=0.5, html = '';
+      for (let i=0;i<full;i++) html+='<span class="star">★</span>';
+      if (half) html+='<span class="star" style="color:#ccc">★</span>';
+      html+=`<span style="color:#222;font-weight:700;margin-left:3px;font-size:0.99em;">${r.toFixed(1)}</span>`;
+      return html;
+    }
+    function renderList(arr) {
+      const list = document.getElementById('main-list');
+      list.innerHTML = '';
+      arr.forEach((p,idx)=>{
+        list.innerHTML += `
+          <div class="card" data-idx="${idx}" tabindex="0" aria-label="More info: ${p.title}">
+            <img class="card-img" src="${p.img}" alt="">
+            <div class="color-dots">
+              ${p.colors.map(c=>`<span class="color-dot" style="background:${c.hex};"></span>`).join('')}
+            </div>
+            <div class="card-title">${p.title}</div>
+            <div class="card-desc">${p.desc}</div>
+            <div class="card-stars">${starRow(p.rating)}</div>
+            <div class="sim-icons">${simIcons()}</div>
+          </div>
+        `;
+      });
+    }
+    renderList(phones);
+
+    let modalOpen = false, isDelivering = false;
+    document.body.addEventListener('click', function(e){
+      if (isDelivering || modalOpen) return; // overlay = нельзя кликать!
+      let card = e.target.closest('.card');
+      if (card) {
+        let idx = +card.dataset.idx;
+        showModal(idx);
+      }
+    });
+
+    let modalBg = document.getElementById('modal-bg');
+    let deliveryBg = document.getElementById('delivery-bg');
+    let selectedPhone = null, selectedColor = 0, selectedSim = 0, selectedStorage = 0;
+
+    function showModal(idx) {
+      if (isDelivering) return;
+      modalOpen = true;
+      selectedPhone = phones[idx];
+      selectedColor = 0;
+      selectedSim = 0;
+      selectedStorage = 0;
+      modalBg.innerHTML = `
+        <div class="modal" role="dialog" aria-modal="true">
+          <button class="modal-close" aria-label="Close">&times;</button>
+          <img src="${selectedPhone.colors[0].url}" class="modal-img" id="modal-img" alt="">
+          <div class="modal-colors">
+            ${selectedPhone.colors.map((c,i)=>
+              `<span class="modal-color${i==0?' selected':''}" data-i="${i}" title="${c.name}" style="background:${c.hex}"></span>`
+            ).join('')}
+          </div>
+          <div class="modal-storages">
+            ${selectedPhone.storages.map((s,i)=>
+              `<span class="modal-storage${i==0?' selected':''}" data-i="${i}">${s}</span>`
+            ).join('')}
+          </div>
+          <div class="modal-sims">
+            ${simIconsArr.map((url,i)=>`
+              <span class="modal-sim${i==0?' selected':''}" data-i="${i}">
+                <img src="${url}" alt="SIM">
+              </span>
+            `).join('')}
+          </div>
+          <div class="modal-title">${selectedPhone.title}</div>
+          <div class="modal-rating">★ ${selectedPhone.rating}</div>
+          <button class="modal-continue">Continue</button>
+        </div>
+      `;
+      modalBg.classList.remove('hidden');
+      modalBg.classList.add('modal-bg-open');
+      setTimeout(()=>{ modalOpen = false; }, 400);
+
+      modalBg.querySelector('.modal').addEventListener('click', e => e.stopPropagation());
+      modalBg.querySelectorAll('.modal-color').forEach(c=>{
+        c.onclick = function(e){
+          e.stopPropagation();
+          modalBg.querySelectorAll('.modal-color').forEach(el=>el.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedColor = +this.dataset.i;
+          modalBg.querySelector('#modal-img').src = selectedPhone.colors[selectedColor].url;
+        }
+      });
+      modalBg.querySelectorAll('.modal-storage').forEach(s=>{
+        s.onclick = function(e){
+          e.stopPropagation();
+          modalBg.querySelectorAll('.modal-storage').forEach(el=>el.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedStorage = +this.dataset.i;
+        }
+      });
+      modalBg.querySelectorAll('.modal-sim').forEach(s=>{
+        s.onclick = function(e){
+          e.stopPropagation();
+          modalBg.querySelectorAll('.modal-sim').forEach(el=>el.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedSim = +this.dataset.i;
+        }
+      });
+      modalBg.querySelector('.modal-close').onclick = function(e){ e.stopPropagation(); closeModal(); };
+      modalBg.querySelector('.modal-continue').onclick = function(e){
+        e.stopPropagation(); closeModal(); startDeliveryAnim();
+      };
+      document.onkeydown = function(evt){
+        if (evt.key === "Escape" && modalOpen) closeModal();
+      }
+    }
+    function closeModal() {
+      modalBg.classList.add('hidden');
+      modalBg.classList.remove('modal-bg-open');
+      modalOpen = false;
+    }
+
+    // --- ЛУЧШАЯ анимация delivery ---
+    function startDeliveryAnim() {
+      isDelivering = true;
+      deliveryBg.innerHTML = `
+        <div class="delivery-stage">
+          <img src="https://i.ibb.co/MytdP8qP/2555001.png" class="delivery-car-img" id="car-img" alt="truck">
+          <div class="delivery-greenbox" id="delivery-green">
+            <div class="check">
+              <svg width="42" height="42" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="none"/><path d="M8.5 18l5 5 10-10" stroke="#41d87e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="label">Item on the way!</div>
+          </div>
+        </div>
+      `;
+      const car = document.getElementById('car-img');
+      const green = document.getElementById('delivery-green');
+      // Скрываем плашку
+      green.classList.remove('visible');
+      deliveryBg.classList.remove('hidden');
+      // Машина подъезжает к центру (0.85s)
+      setTimeout(()=>{ car.classList.add('visible'); }, 40);
+      // Стоит на месте 0.7s (с вау-эффектом)
+      setTimeout(()=>{ car.classList.add('leaving'); }, 930);
+      // Плашка — только когда машина полностью уехала (ещё 1.2s)
+      setTimeout(()=>{
+        green.classList.add('visible');
+      }, 2170);
+      // Всё убирается только после плавного fade-in плашки
+      setTimeout(()=>{
+        deliveryBg.classList.add('hidden');
+        isDelivering = false;
+      }, 3250);
+    }
+
+    // Для поиска
+    document.getElementById('search').addEventListener('input', function(){
+      const val = this.value.trim().toLowerCase();
+      renderList(
+        phones.filter(p=>
+          p.title.toLowerCase().includes(val) ||
+          p.desc.toLowerCase().includes(val)
+        )
+      );
+    });
+
+    // Стопим overlay при загрузке
+    window.addEventListener('DOMContentLoaded',()=>{
+      setTimeout(()=>{
+        if (!modalBg.classList.contains('hidden')) modalBg.classList.add('hidden');
+        if (!deliveryBg.classList.contains('hidden')) deliveryBg.classList.add('hidden');
+      },700);
+    });
+    window.addEventListener('keydown', function(evt) {
+      if (evt.key === "Escape") {
+        if (!modalBg.classList.contains('hidden')) closeModal();
+        if (!deliveryBg.classList.contains('hidden')) deliveryBg.classList.add('hidden');
+      }
+    });
+    // Стопим случайный скролл при overlay
+    [modalBg, deliveryBg].forEach(bg => {
+      bg.addEventListener('touchmove', e => { if (!bg.classList.contains('hidden')) e.preventDefault(); }, {passive:false});
+    });
+  </script>
+</body>
+</html>
